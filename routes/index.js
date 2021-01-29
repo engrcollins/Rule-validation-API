@@ -25,6 +25,12 @@ router.post('/validate-rule', async (req, res) => {
         "status": "error",
         "data": null
     })
+    let fieldArray = []
+    let validation = {
+        "error": true,
+        "condition": rule.condition,
+        "condition_value": rule.condition_value
+    }
     if ((typeof rule === "undefined") || (typeof data === "undefined")){
         endPointRes.message = "Invalid JSON payload passed.";
           return res.status(400).json(endPointRes);
@@ -39,104 +45,91 @@ router.post('/validate-rule', async (req, res) => {
         endPointRes.message =  "rule field is required.";
         return res.status(400).json(endPointRes);   
     }else {
-        let fieldArray = rule.field.split(".");
-        if (fieldArray.length < 2){
-            endPointRes.message = "rule field chain is required.";
-            return res.status(400).json(endPointRes);
-        }else {
-            if (typeof data[fieldArray[0]] === "undefined"){
-                endPointRes.message = `Field ${fieldArray[0]} is missing.`;
-                return res.status(400).json(endPointRes);
-            }else if (typeof data[fieldArray[0]][fieldArray[1]] === "undefined"){
-                endPointRes.message = `Field ${fieldArray[0]}.${fieldArray[1]} is missing.`;
-                return res.status(400).json(endPointRes);
+        if (typeof data === "object"){
+            fieldArray = rule.field.split(".")
+            if (fieldArray.length === 2){
+                validation.field = `${fieldArray[0]}.${fieldArray[1]}`
+                validation.field_value = data[fieldArray[0]][fieldArray[1]]
+            }else if (fieldArray.length === 1) {
+                validation.field = fieldArray[0]
+                validation.field_value = data[fieldArray[0]]
             }
+        }else{
+            validation.field = rule.field
+            validation.field_value = data[rule.field]
         }
-        let validation = {
-            "error": false,
-            "field": fieldArray[0],
-            "field_value": data[fieldArray[0]][fieldArray[1]],
-            "condition": rule.condition,
-            "condition_value": rule.condition_value
+        console.log(validation.field, validation.field_value)
+        if (typeof validation.field_value === "undefined"){
+                endPointRes.message = `Field ${validation.field} is missing from data.`;
+                return res.status(400).json(endPointRes);
         }
+        endPointRes.data = {"validation":validation};
         switch(rule.condition){
             case "eq":
-               if (data[fieldArray[0]][fieldArray[1]] == rule.condition_value){
-                    endPointRes.message = "field missions successfully validated.";
+               if (validation.field_value == rule.condition_value){
+                    endPointRes.message = `field ${validation.field} successfully validated.`;
                     endPointRes.status = "success";
-                    endPointRes.data = validation;
+                    validation.error = false;
                     return res.status(200).json(endPointRes);
                }else {
-                    endPointRes.message = "field missions failed validated.";
+                    endPointRes.message = `field ${validation.field} failed validation.`;
                     endPointRes.status = "error";
-                    validation.error = true;
-                    endPointRes.data = validation;
                     return res.status(400).json(endPointRes);
                }
 
             case "neq":
-                if (data[fieldArray[0]][fieldArray[1]] !== rule.condition_value){
-                    endPointRes.message = "field missions successfully validated.";
+                if (validation.field_value !== rule.condition_value){
+                    endPointRes.message = `field ${validation.field} successfully validated.`;
                     endPointRes.status = "success";
-                    endPointRes.data = validation;
+                    validation.error = false;
                     return res.status(200).json(endPointRes);
                 }else {
-                    endPointRes.message = "field missions failed validated.";
+                    endPointRes.message = `field ${validation.field} failed validation.`;
                     endPointRes.status = "error";
-                    validation.error = true;
-                    endPointRes.data = validation;
                     return res.status(400).json(endPointRes);
                 }
 
             case "gt":
-                if (data[fieldArray[0]][fieldArray[1]] > rule.condition_value){
-                    endPointRes.message = "field missions successfully validated."
-                    endPointRes.status = "success"
-                    endPointRes.data = validation
-                    return res.status(200).json(endPointRes)
+                if (validation.field_value > rule.condition_value){
+                    endPointRes.message = `field ${validation.field} successfully validated.`;
+                    endPointRes.status = "success";
+                    validation.error = false;
+                    return res.status(200).json(endPointRes);
                 }else {
-                    endPointRes.message = "field missions failed validated.";
+                    endPointRes.message = `field ${validation.field} failed validation.`;
                     endPointRes.status = "error";
-                    validation.error = true;
-                    endPointRes.data = validation;
                     return res.status(400).json(endPointRes);
                 }
 
             case "gte":
-                if (data[fieldArray[0]][fieldArray[1]] >= rule.condition_value){
-                    endPointRes.message = "field missions successfully validated."
-                    endPointRes.status = "success"
-                    endPointRes.data = validation
-                    return res.status(200).json(endPointRes)
+                if (validation.field_value >= rule.condition_value){
+                    endPointRes.message = `field ${validation.field} successfully validated.`;
+                    endPointRes.status = "success";
+                    validation.error = false;
+                    return res.status(200).json(endPointRes);
                 }else {
-                    endPointRes.message = "field missions failed validated.";
+                    endPointRes.message = `field ${validation.field} failed validation.`;
                     endPointRes.status = "error";
-                    validation.error = true;
-                    endPointRes.data = validation;
                     return res.status(400).json(endPointRes);
                 }
                
             case "contains":
-                let x = data[fieldArray[0]][fieldArray[1]].toString()
-                let y = rule.condition_value.toString()
+                let x = validation.field_value.toString();
+                let y = rule.condition_value.toString();
                 if ( x.includes(y)){
-                    endPointRes.message = "field missions successfully validated."
-                    endPointRes.status = "success"
-                    endPointRes.data = validation
+                    endPointRes.message = `field ${validation.field} successfully validated.`;
+                    endPointRes.status = "success";
+                    validation.error = false;
                     return res.status(200).json(endPointRes)
                 }else {
-                    endPointRes.message = "field missions failed validated.";
+                    endPointRes.message = `field ${validation.field} failed validation.`;
                     endPointRes.status = "error";
-                    validation.error = true;
-                    endPointRes.data = validation;
                     return res.status(400).json(endPointRes);
                 }
                     
             default:
-                endPointRes.message = "field missions failed validated.";
+                endPointRes.message = `field ${validation.field} failed validation."`;
                 endPointRes.status = "error";
-                validation.error = true;
-                endPointRes.data = validation;
                 return res.status(400).json(endPointRes);
         }
     }
