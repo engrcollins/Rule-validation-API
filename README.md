@@ -47,25 +47,30 @@ The route accepts JSON data containing a rule and data field to validate the rul
 }
 ```
 ### Endpoint requirements/constraints:
-- [x] The rule and data fields are required.
+- [x] A. The rule and data fields are required.
 
-- [x] The rule field should be a valid JSON object and should contain the following required fields:
+- [x] B. The rule field should be a valid JSON object and should contain the following required fields:
     - b1 field: The field in the data passed to validate the rule against. My implementation for the field also supports nested data objects. e.g. if field is passed as `"card.first6"` it means I have to check to see if the data contains a card field, then check to see if the card field contains a `first6` field. `*Note:*` The nesting is not more than two levels
     - b2 condition: The condition to use for validating the rule. Accepted condition values are:
         > *i. eq: Means the field value should be equal to the condition value*
-        > *ii. neq:* Means the field value should not be equal to the condition value 
-        **iii. gt:** Means the field value should be greater than the condition value 
-        **iv. gte:** Means the field value should be greater than or equal to the condition value 
-        **v. contains:** Means the field value should contain the condition value
-    **b3. condition_value:** The condition value to run the rule against. Your rule evaluation is expected to be like: 
+
+        > *ii. neq:* Means the field value should not be equal to the condition value.*
+        
+        >*iii. gt: Means the field value should be greater than the condition value.* 
+        
+        >*iv. gte: Means the field value should be greater than or equal to the condition value .*
+
+        >*v. contains:* Means the field value should contain the condition value.*
+
+    - b3 condition_value: The condition value to run the rule against. Your rule evaluation is expected to be like: 
     `["data.field"] ["rule.condition"] ["rule.condition_value"]`
 
-***c.*** The data field can be any of:
-    c1/ A valid JSON object 
-    c2/ A valid array
-    c3/ A string
+- [x] C. The data field can be any of:
+    - c1/ A valid JSON object 
+    - c2/ A valid array
+    - c3/ A string
 
-***d*** If a required field isn't passed, my endpoint returns with a response (HTTP 400 status code) that is similar to the below: 
+- [x] D. If a required field isn't passed, my endpoint returns with a response (HTTP 400 status code) that is similar to the below: 
 ```jsx
     {
         "message": "[field] is required."
@@ -83,7 +88,7 @@ The route accepts JSON data containing a rule and data field to validate the rul
 ```
     
     
-***e.*** If a field is of the wrong type, my endpoint returns with a response (HTTP 400 status code) that is similar to the below:
+- [x] E. If a field is of the wrong type, my endpoint returns with a response (HTTP 400 status code) that is similar to the below:
 ```jsx
         {
             "message": "[field] should be a|an [type]."
@@ -101,7 +106,7 @@ The route accepts JSON data containing a rule and data field to validate the rul
 ```
 
 
-***f.*** If an invalid JSON payload is passed to my API, the endpoint response (HTTP 400 status code) would be:
+- [x] F. If an invalid JSON payload is passed to my API, the endpoint response (HTTP 400 status code) would be:
 ```jsx
     {
         "message": "Invalid JSON payload passed."
@@ -110,7 +115,7 @@ The route accepts JSON data containing a rule and data field to validate the rul
     }       
 ```
 
-***g.*** If the field specified in the rule object is missing from the data passed, my endpoint response (HTTP 400 status code) would be:
+- [x] G. If the field specified in the rule object is missing from the data passed, my endpoint response (HTTP 400 status code) would be:
 ```jsx
     {
         "message": "field [name of field] is missing from data."
@@ -118,7 +123,7 @@ The route accepts JSON data containing a rule and data field to validate the rul
         "data": null
     }
 ```
-e.g.
+E.g.
 ```jsx
     {
         "message": "field age is missing from data."
@@ -127,7 +132,7 @@ e.g.
     }
 ```
 
-***h.*** If the rule is successfully validated, my endpoint response (HTTP 200 status code) would be:
+- [x] H. If the rule is successfully validated, my endpoint response (HTTP 200 status code) would be:
 ```jsx
     {
         "message": "field [name of field] successfully validated."
@@ -143,7 +148,7 @@ e.g.
         }
     }
 ```
-e.g.
+E.g.
 ```jsx
     {
         "message": "field missions successfully validated."
@@ -160,7 +165,7 @@ e.g.
     }
 ```
 
-***i.*** If the rule validation fails, my endpoint response (HTTP 400 status code) would be:
+- [x] I. If the rule validation fails, my endpoint response (HTTP 400 status code) would be:
 ```jsx
     {
         "message": "field [name of field] failed validation."
@@ -176,7 +181,7 @@ e.g.
         }
     }
 ```
-e.g.
+E.g.
 ```jsx
     {
         "message": "field missions failed validation."
@@ -192,16 +197,15 @@ e.g.
         }
     }
 ```
-
-***j.*** My API solution is hosted on [Heroku](https://heroku.com//)
+- [x] J. My API solution is hosted on [Heroku](https://heroku.com//)
 The two routes are accessible via:
 - a/ HTTP [GET] https://collins-flutter.herokuapp.com/
 - b/ HTTP [POST] https://collins-flutter.herokuapp.com/validate-rule
 
 ---
 
-#### Example JSON request payloads:
-- = EX1 =
+##### Example JSON request payloads:
+- Example 1
 ```jsx 
     {
         "rule": {
@@ -239,7 +243,7 @@ The two routes are accessible via:
     }
 ```
 
-- = EX2 =
+- = Example 2
 ```jsx
     {
         "rule": {
@@ -267,7 +271,7 @@ The two routes are accessible via:
     }
 ```
 
-- = EX3 =
+- Example 3
 ```jsx
   {
     "rule": {
