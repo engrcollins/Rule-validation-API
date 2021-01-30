@@ -47,9 +47,9 @@ The route accepts JSON data containing a rule and data field to validate the rul
 }
 ```
 ### Endpoint requirements/constraints:
-***a*** The rule and data fields are required.
+- [x] The rule and data fields are required.
 
-***b*** The rule field should be a valid JSON object and should contain the following required fields:
+- [ ] The rule field should be a valid JSON object and should contain the following required fields:
     **b1 field:** The field in the data passed to validate the rule against. My implementation for the field also supports nested data objects. e.g. if field is passed as `"card.first6"` it means I have to check to see if the data contains a card field, then check to see if the card field contains a `first6` field. `*Note:*` The nesting is not more than two levels
     **b2 condition:** The condition to use for validating the rule. Accepted condition values are:
         **i. eq:** Means the field value should be equal to the condition value 
@@ -198,4 +198,92 @@ The two routes are accessible via:
 - a/ HTTP [GET] https://collins-flutter.herokuapp.com/
 - b/ HTTP [POST] https://collins-flutter.herokuapp.com/validate-rule
 
+---
+
+####Example JSON request payloads:
+- = EX1 =
+```jsx 
+    {
+        "rule": {
+            "field": "missions.count"
+            "condition": "gte",
+            "condition_value": 30
+        },
+        "data": {
+            "name": "James Holden",
+            "crew": "Rocinante",
+            "age": 34,
+            "position": "Captain",
+            "missions": {
+            count: 45,
+            successful: 44,
+            failed: 1
+            }
+        }
+    }
+```
+***Response: (HTTP 200)***
+```jsx
+    {
+        "message": "field missions.count successfully validated."
+        "status": "success",
+        "data": {
+            "validation": {
+            "error": false,
+            "field": "missions.count",
+            "field_value": 45,
+            "condition": "gte",
+            "condition_value: 30
+            }
+        }
+    }
+```
+
+- = EX2 =
+```jsx
+    {
+        "rule": {
+            "field": "0"
+            "condition": "eq",
+            "condition_value": "a"
+        },
+        "data": "damien-marley"
+    }
+```
+***Response: (HTTP 400)***
+```jsx
+    {
+        "message": "field 0 failed validation."
+        "status": "error",
+        "data": {
+            "validation": {
+            "error": true,
+            "field": "0",
+            "field_value": "d",
+            "condition": "eq",
+            "condition_value: "a"
+            }
+        }
+    }
+```
+
+- = EX3 =
+```jsx
+  {
+    "rule": {
+        "field": "5"
+        "condition": "contains",
+        "condition_value": "rocinante"
+    },
+        "data": ["The Nauvoo", "The Razorback", "The Roci", "Tycho"]
+    }
+```
+***Response: (HTTP 400)***
+```jsx
+    {
+        "message": "field 5 is missing from data."
+        "status": "error",
+        "data": null
+    }
+```
 
