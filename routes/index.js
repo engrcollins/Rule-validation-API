@@ -2,6 +2,7 @@ const axios = require('axios');
 const express = require('express');
 const router = express.Router();
 
+//HTTP GET - Base route "/"
 router.get('/', async (req, res) => {
     myProfile = {
         "message": "My Rule-Validation API",
@@ -17,9 +18,12 @@ router.get('/', async (req, res) => {
     return res.status(200).send(myProfile);
 })
 
+//HTTP Post "/validate-rule"
 router.post('/validate-rule', async (req, res) => {
     let rule = req.body.rule;
     let data = req.body.data;
+    
+    //Defining response template
     let endPointRes = ({
         "message": "default message",
         "status": "error",
@@ -31,6 +35,8 @@ router.post('/validate-rule', async (req, res) => {
         "condition": rule.condition,
         "condition_value": rule.condition_value
     }
+
+    //Checking endpoint requirements
     if ((typeof rule === "undefined") || (typeof data === "undefined")){
         endPointRes.message = "Invalid JSON payload passed.";
           return res.status(400).json(endPointRes);
@@ -64,6 +70,8 @@ router.post('/validate-rule', async (req, res) => {
                 return res.status(400).json(endPointRes);
         }
         endPointRes.data = {"validation":validation};
+
+        //Implementing actual rule validation using specified conditions
         switch(rule.condition){
             case "eq":
                if (validation.field_value == rule.condition_value){

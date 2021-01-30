@@ -1,64 +1,79 @@
-## ENYE Phase 1.2: Back-end
+## A Simple Rule-validation API: Back-end
 This challenge examined my back-end skills in creating the backbone structure of an application
 
 ### Currency Rates API
 
-I was tasked with creating a service integration to a public API and exposing a RESTful endpoint. The endpoint will accept requests and returns a modified response schema from the integrated API.
+I was tasked with creating a simple rule-validation API. The response structure for my API is fashioned after the popular JSEND pattern. 
 
-My application integrate with the [Exchange Rate API](https://api.exchangeratesapi.io/latest) to proxy requests 
-
-- My REST endpoint `/api/rates` returns a JSON object of the latest currency rates in the following format/schema:
-
+Example:
 ```jsx
 {
-    "results": {
-        "base": "",
-        "date": "",
-        "rates": {
-        }
+  "message": "API response message",
+  "status": "success",
+  "data": {
+    isValidForRule: true,
+  }
+}
+```
+My rule-validation API have two routes:
+1. First route is the base route. HTTP GET "/". It returns with data in the following format:
+```jsx
+{
+    "message": "My Rule-Validation API",
+    "status": "success",
+    "data": {
+        "name": "Collins John DOE",
+        "github": "@engrcollins",
+        "email": "collinsjohndoe@gmail.com",
+        "mobile": "080123456789",
+        "twitter": "@engrcollins14"
     }
 }
 ```
+2. Second route is the rule validation route. HTTP POST "/validate-rule"
+The route accepts JSON data containing a rule and data field to validate the rule against. Example:
+```jsx
+{
+  "rule": {
+    "field": "missions"
+    "condition": "gte",
+    "condition_value": 30
+  },
+  "data": {
+    "name": "James Holden",
+    "crew": "Rocinante",
+    "age": 34,
+    "position": "Captain",
+    "missions": 45
+  }
+}
+```
+### Endpoint requirements/constraints:
+***a*** The rule and data fields are required.
 
-### Required Technology
+***b*** The rule field should be a valid JSON object and should contain the following required fields: 
+**b1 field:** The field in the data passed to validate the rule against. My implementation for the field also supports nested data objects. e.g. if field is passed as "card.first6" it means I have to check to see if the data contains a card field, then check to see if the card field contains a first6 field. *Note:* The nesting is not more than two levels]
+b2/ condition: The condition to use for validating the rule. Accepted condition values are:
+    i/ eq: Means the field value should be equal to the condition value 
+    ii/ neq: Means the field value should not be equal to the condition value 
+    iii/ gt: Means the field value should be greater than the condition value 
+    iv/ gte: Means the field value should be greater than or equal to the condition value 
+    v/ contains: Means the field value should contain the condition value
+b3/ condition_value: The condition value to run the rule against. Your rule evaluation is expected to be like: 
+["data.field"] ["rule.condition"] ["rule.condition_value"]
+
+c/ The data field can be any of:
+c1/ A valid JSON object 
+c2/ A valid array
+c3/ A string
 
 - [ExpressJS](https://expressjs.com/)
 
-### Tasks Completed
 
-1. I created an endpoint that accepts a `GET` request to `/api/rates`
-2. The `/api/rates` endpoint accepts the following request query parameter strings
-    1. **base**: the home currency rates quoted against (e.g. `CZK`)
-    2. **currency**: the specific exchange rates based on a comma-separated symbols parameter (e.g. `EUR,GBP,USD`).
-3. I assumed standard HTTP status codes on the response. If a request is unsuccessful, my application properly handles it accordingly with the appropriate status codes
-4. Upon a successful API response, the fetched payload tansforms into an object containing the following keys:
-    1. **results**: JSON object containing the results from the API
-    2. **base**: the requested home rate from the request URL query strings
-    3. **date**: the current date 
-    4. **rates**: An Object containing the requested currency in the request URL query strings
-5. My application server is written with Node using an Express server ([https://expressjs.com/](https://expressjs.com/))
+    2. **currency**: the specific exchange rates based on a 
 6. My backend code was deployed on - [Heroku](https://heroku.com/)
 
 ---
 
 A sample `GET` request to fetch the currency exchange rates from `USD` to `CNY,JPY,CAD` looks like:
 
-```jsx
-    enye-collins-api.herokuapp.com/api/rates?base=usd&currency=cny,jpy,cad
-```
-
-A successful response for the above request should return the following schema (of course with a more up-to-date values)
-
-```jsx
-{
-    "results": {
-        "base": "USD",
-        "date": "2021-01-14",
-        "rates": {
-            "CNY": 6.4672550313,
-            "JPY": 104.0993071594,
-            "CAD": 1.2686407126
-        }
-    }
-}
-```
