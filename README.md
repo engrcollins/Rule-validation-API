@@ -49,11 +49,11 @@ The route accepts JSON data containing a rule and data field to validate the rul
 ### Endpoint requirements/constraints:
 - [x] The rule and data fields are required.
 
-- [ ] The rule field should be a valid JSON object and should contain the following required fields:
-    **b1 field:** The field in the data passed to validate the rule against. My implementation for the field also supports nested data objects. e.g. if field is passed as `"card.first6"` it means I have to check to see if the data contains a card field, then check to see if the card field contains a `first6` field. `*Note:*` The nesting is not more than two levels
-    **b2 condition:** The condition to use for validating the rule. Accepted condition values are:
-        **i. eq:** Means the field value should be equal to the condition value 
-        **ii. neq:** Means the field value should not be equal to the condition value 
+- [x] The rule field should be a valid JSON object and should contain the following required fields:
+    - b1 field: The field in the data passed to validate the rule against. My implementation for the field also supports nested data objects. e.g. if field is passed as `"card.first6"` it means I have to check to see if the data contains a card field, then check to see if the card field contains a `first6` field. `*Note:*` The nesting is not more than two levels
+    - b2 condition: The condition to use for validating the rule. Accepted condition values are:
+        > *i. eq: Means the field value should be equal to the condition value*
+        > *ii. neq:* Means the field value should not be equal to the condition value 
         **iii. gt:** Means the field value should be greater than the condition value 
         **iv. gte:** Means the field value should be greater than or equal to the condition value 
         **v. contains:** Means the field value should contain the condition value
@@ -200,7 +200,7 @@ The two routes are accessible via:
 
 ---
 
-####Example JSON request payloads:
+#### Example JSON request payloads:
 - = EX1 =
 ```jsx 
     {
