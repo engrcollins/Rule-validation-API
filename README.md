@@ -1,4 +1,4 @@
-## A Simple Rule-validation API: Flutterwave (Full-Time)
+## A Simple Rule-validation API: 
 This challenge examined my back-end skills in creating the backbone structure of an application.
 
 I was tasked with creating a simple rule-validation API. The response structure for my API is fashioned after the popular JSEND pattern. 
